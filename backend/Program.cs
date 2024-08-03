@@ -23,6 +23,18 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:3000") // Укажите разрешенные источники
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials(); // Разрешите креденциалы, если они необходимы
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -38,6 +50,8 @@ app.UseRouting();
 
 // Использование авторизации (если есть)
 app.UseAuthorization();
+
+app.UseCors("CorsPolicy");
 
 // Настройка конечных точек для контроллеров
 app.UseEndpoints(endpoints =>

@@ -1,0 +1,9 @@
+<Router>
+      <div className="Main">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route exact path="/" element={<Login />} />
+        </Routes>
+      </div>
+    </Router>

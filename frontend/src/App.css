@@ -1,51 +1,135 @@
-.Main{
-    background-color: rgb(34, 34, 34);
-    width: 100%;
-    height: 100vh;
+.Container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
 }
 
-.Form{
+.Chats {
     color: white;
+    width: 30%;
     background-color: rgb(51, 51, 51);
-    padding: 25px;
-    width: 20%;
-    border-radius: 20px;
-    text-align: center;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    overflow-y: auto;
+}
+
+.Chats h2 {
+    margin-top: 0;
+    color: white;
+}
+
+.Chats ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.Chats li {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+    transition: background-color 0.3s;
+}
+
+.Chats li:hover {
+    background-color: #ddd;
+}
+
+.AddChatButton {
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: rgb(232, 85, 85);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    font-size: 16px;
+}
+
+.AddChatButton:hover {
+    background-color: rgb(236, 31, 31)
+}
+
+.ChatWindow {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: rgb(34, 34, 34);
     display: flex;
     flex-direction: column;
-    align-items: center;
+    overflow-y: auto;
+    color: white;
 }
 
-.Button{
-    background-color: rgb(232, 85, 85);
-    border-style: none;
+.ChatWindow h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.Messages {
+    flex-grow: 1;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+}
+
+.Message {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 15px;
+    max-width: 70%;
+    word-wrap: break-word;
+    position: relative;
+}
+
+.Message.left {
+    background-color: #e0e0e0;
+    align-self: flex-start;
+}
+
+.Message.right {
+    background-color: #007bff;
     color: white;
-    border-radius: 30px;
-    padding: 15px;
-    width: 75%;
-    font-weight: bold;
+    align-self: flex-end;
+}
+
+.Messages p {
+    margin: 5px 0;
+}
+
+.Messages strong {
+    color: inherit;
+}
+.MessageInputForm {
+    display: flex;
     margin-top: 20px;
 }
 
-.Input-Field{
-    background-color: rgb(68, 68, 68);
-    margin: 15px;
-    color: white;
-    border-style: none;
+.MessageInput {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 15px;
-    width: 75%;
+    font-size: 16px;
 }
 
-.Form input::placeholder {
-    color: rgb(102, 102, 102);
+.SendMessageButton {
+    margin-left: 10px;
+    padding: 10px 15px;
+    background-color: rgb(232, 85, 85);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
-.two-items{
-    display: flex;
-    flex-direction:row;
-    align-items: center;
+.SendMessageButton:hover {
+    background-color: rgb(236, 31, 31)
 }

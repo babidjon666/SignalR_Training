@@ -26,10 +26,5 @@ namespace backend.Controllers
 
             return Ok(result.Message);
         }
-
-        [HttpPost]
-        public IActionResult SayHi(){
-            return Ok("Hi");
-        }
     }
 }
