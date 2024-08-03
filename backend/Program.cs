@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     
 builder.Services.AddScoped<ILogin, LoginService>();
 builder.Services.AddScoped<IRegister, RegisterService>();
+builder.Services.AddScoped<IChat, ChatService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

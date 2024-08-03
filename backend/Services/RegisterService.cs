@@ -23,11 +23,11 @@ namespace backend.Services
             return await _context.Users.AnyAsync(u => u.UserName == userName || u.Email == email);
         }
 
-        public async Task<RegisterResult> Register(string userName, string userSurname, string email, string password)
+        public async Task<Result> Register(string userName, string userSurname, string email, string password)
         {
             if (await CheckName(userName, email))
             {
-                return new RegisterResult { Success = false, Message = "Такой пользователь уже есть!" };
+                return new Result { Success = false, Message = "Такой пользователь уже есть!" };
             }
 
             var hashedPassword = HashPassword.GetHash(password);
@@ -43,9 +43,7 @@ namespace backend.Services
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
-            return new RegisterResult { Success = true, Message = "Пользователь зарегестрирован!" };
+            return new Result { Success = true, Message = "Пользователь зарегестрирован!" };
         }
-
-        
     }
 }
