@@ -19,11 +19,11 @@ namespace backend.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest request){
             var result = await _loginService.Login(request.Email, request.Password);
 
-            if (!result.Success){
-                return Conflict(result.Message);
+            if (!result.Result.Success){
+                return Unauthorized(result.Result.Message);
             }
 
-            return Ok(result.Message);
+            return Ok(result);
         }
     }
 }

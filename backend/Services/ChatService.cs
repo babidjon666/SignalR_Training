@@ -1,30 +1,29 @@
 using backend.Data;
 using backend.DTOModel;
 using backend.DTOModel.GetChatsDTO;
+using backend.Hubs;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services
 {
     public class ChatService: IChat
     {
-        private readonly ApplicationDbContext _context;
-
-        public ChatService(ApplicationDbContext _context)
+        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IChatRepository _chatRepository;
+        public ChatService(IHubContext<ChatHub> _hubContext, IChatRepository _chatRepository)
         {
-            this._context = _context;
+            this._hubContext = _hubContext;
+            this._chatRepository = _chatRepository;
         }
 
         public async Task<Result> CreateChat(string myName, string friendName)
         {
-            var dbUser1 = await _context.Users
-                                    .Include(u => u.Chats)
-                                    .FirstOrDefaultAsync(u => u.UserName == myName);
-            var dbUser2 = await _context.Users
-                                    .Include(u => u.Chats)
-                                    .FirstOrDefaultAsync(u => u.UserName == friendName);
-            
+            var dbUser1 = await _chatRepository.GetUserByNameAsync(myName);
+            var dbUser2 = await _chatRepository.GetUserByNameAsync(friendName);
+
             if (dbUser1 == null || dbUser2 == null){
                 var badResponse = new Result{
                     Success = false,
@@ -34,9 +33,9 @@ namespace backend.Services
                 return badResponse;
             }
 
-            bool chatExists = dbUser1.Chats.Any(c => c.Users.Contains(dbUser2) && c.Users.Contains(dbUser1));
+            var chatExists = await _chatRepository.GetChatByUsersAsync(dbUser1, dbUser2);
 
-            if (chatExists)
+            if (chatExists != null)
             {
                 return new Result
                 {
@@ -50,29 +49,29 @@ namespace backend.Services
                 Users = new List<User> { dbUser1, dbUser2 }
             };
 
-            _context.Chats.Add(chat);
-            await _context.SaveChangesAsync();
+            await _chatRepository.AddChatAsync(chat);
 
             dbUser1.Chats.Add(chat);
             dbUser2.Chats.Add(chat);
-            await _context.SaveChangesAsync();
+            await _chatRepository.SaveChangesAsync();
+
+            await _hubContext.Clients.User(dbUser1.Id.ToString()).SendAsync("ReceiveChatUpdate");
+            await _hubContext.Clients.User(dbUser2.Id.ToString()).SendAsync("ReceiveChatUpdate");
 
             var goodResponse = new Result
                 {
                     Success = true,
                     Message = "Чат успешно создан!"
                 };
-                return goodResponse;
+                
+            return goodResponse;
         }
 
         public async Task<GetChatResult> GetChats(string userName)
         {
-            var user = await _context.Users
-                                     .Include(u => u.Chats)
-                                     .ThenInclude(c => c.Users)
-                                     .FirstOrDefaultAsync(u => u.UserName == userName);
+            var dbUser = await _chatRepository.GetUserByNameAsync(userName);
 
-            if (user == null)
+            if (dbUser == null)
             {
                 var badResponse = new GetChatResult{
                     Success = false,
@@ -83,10 +82,22 @@ namespace backend.Services
                 return badResponse;
             }
 
+            List<ChatDTO> userChats = new List<ChatDTO>();
+
+            foreach(var chat in dbUser.Chats){
+                userChats.Add(
+                    new ChatDTO{
+                        ChatId = chat.Id,
+                        User1Name = chat.Users[0].UserName,
+                        User2Name = chat.Users[1].UserName
+                    }
+                );
+            }
+            
             var goodResponse = new GetChatResult{
                     Success = true,
-                    Message = $"Все чаты пользователя {user.UserName}",
-                    Chats = user.Chats
+                    Message = $"Все чаты пользователя {dbUser.UserName}",
+                    Chats = userChats
                 };
 
             return goodResponse;

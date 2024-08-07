@@ -1,9 +1,10 @@
 using backend.DTOModel;
+using backend.DTOModel.Login.DTO;
 
 namespace backend.Interfaces
 {
     public interface ILogin
     {
-        Task<Result> Login(string email, string userPassword);
+        Task<LoginResult> Login(string email, string userPassword);
     }
 }

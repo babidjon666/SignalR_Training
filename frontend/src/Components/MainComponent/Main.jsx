@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { fetchChats, createChat } from './Api'; 
 import { Messages } from '../MessagesComponent/Messages';
+import { initializeSignalR } from './signalR'; 
 
 const mockMessages = [
     { id: 1, user: 'Марк', text: 'Привет!' },
@@ -12,62 +13,96 @@ const mockMessages = [
 ];
 
 export const Main = () => {
-    const location = useLocation();
-    const { formData } = location.state || {};
-    const [chats, setChats] = useState([
-        { id: 1, name: 'Chat 1', messages: mockMessages },
-        { id: 2, name: 'Chat 2', messages: mockMessages }
-    ]);
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+    const [chats, setChats] = useState([]);
     const [currentChat, setCurrentChat] = useState(null);
     const [newMessage, setNewMessage] = useState('');
-    const currentUser = 'Марк';
+    const currentUser = user?.userName;
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const data = await fetchChats(currentUser, token);
+                console.log("API Response:", data);
+
+                const chatData = data.$values;
+                const chatsWithMessages = chatData.map(chat => ({
+                    chatId: chat.chatId,
+                    name: `Chat with ${chat.user2Name}`,
+                    messages: mockMessages
+                }));
+                setChats(chatsWithMessages);
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchData();
+    }, [currentUser]);
+
+    useEffect(() => {
+        const handleReceiveChatUpdate = () => {
+            fetchChats(currentUser, localStorage.getItem('token'))
+                .then(data => {
+                    const chatData = data.$values;
+                    const chatsWithMessages = chatData.map(chat => ({
+                        chatId: chat.chatId,
+                        name: `Chat with ${chat.user2Name}`,
+                        messages: mockMessages
+                    }));
+                    setChats(chatsWithMessages);
+                })
+                .catch(error => console.error(error.message));
+        };
+
+        const connection = initializeSignalR(handleReceiveChatUpdate);
+
+    }, [currentUser]);
 
     const handleChatClick = (chat) => {
         setCurrentChat(chat);
     };
 
-    const addChat = () => {
-        const newChat = { id: chats.length + 1, name: `Chat ${chats.length + 1}`, messages: mockMessages };
-        setChats([...chats, newChat]);
+    const addChat = async () => {
+        const friendUserName = prompt('Enter the username of the friend you want to chat with:');
+        if (!friendUserName) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            await createChat(currentUser, friendUserName, token);
+        } catch (error) {
+            console.error(error.message);
+        }
     };
 
     const handleMessageChange = (e) => {
         setNewMessage(e.target.value);
     };
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (!newMessage.trim()) return; // Не отправлять пустое сообщение
+        if (!newMessage.trim()) return;
 
-        const updatedChats = chats.map(chat => {
-            if (chat.id === currentChat.id) {
-                return {
-                    ...chat,
-                    messages: [
-                        ...chat.messages,
-                        {
-                            id: chat.messages.length + 1,
-                            user: currentUser,
-                            text: newMessage
-                        }
-                    ]
-                };
-            }
-            return chat;
-        });
+        const message = {
+            user: currentUser,
+            text: newMessage
+        };
 
-        setChats(updatedChats);
+        // Here you should add the code to send the message to the server
+        // For now, we just clear the input field
         setNewMessage('');
     };
 
     return (
         <div className="Container">
             <div className="Chats">
-                <h2>{formData?.email}</h2>
+                <h2>{currentUser}</h2>
                 <button className="AddChatButton" onClick={addChat}>Add Chat</button>
                 <ul>
-                    {chats.map((chat) => (
-                        <li key={chat.id} onClick={() => handleChatClick(chat)}>
+                    {chats.map(chat => (
+                        <li key={chat.chatId} onClick={() => handleChatClick(chat)}>
                             {chat.name}
                         </li>
                     ))}
@@ -77,7 +112,10 @@ export const Main = () => {
                 {currentChat ? (
                     <div>
                         <h2>{currentChat.name}</h2>
-                        <Messages currentChat={currentChat} currentUser={currentUser} />
+                        <Messages
+                            currentChat={currentChat}
+                            currentUser={currentUser}
+                        />
                         <form onSubmit={handleSendMessage} className="MessageInputForm">
                             <input 
                                 type="text" 
