@@ -59,6 +59,7 @@ export const Main = () => {
 
         const connection = initializeSignalR(handleReceiveChatUpdate);
 
+
     }, [currentUser]);
 
     const handleChatClick = (chat) => {

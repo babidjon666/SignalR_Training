@@ -10,7 +10,11 @@ export const initializeSignalR = (onReceiveChatUpdate) => {
     }
 
     connection = new HubConnectionBuilder()
-    .withUrl("http://localhost:5138/chathub")
+    .withUrl("http://localhost:5138/chathub", {
+        accessTokenFactory: () => {
+            return localStorage.getItem('token');
+        }
+    })
     .withAutomaticReconnect()
     .build();
 

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using backend.Data;
@@ -7,6 +8,7 @@ using backend.Models;
 using backend.Repositories;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -29,6 +31,8 @@ builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<ILogin, LoginService>();
 builder.Services.AddScoped<IRegister, RegisterService>();
 builder.Services.AddScoped<IChat, ChatService>();
+
+builder.Services.AddSingleton<IUserIdProvider, UsernameBasedUserIdProvider>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -66,9 +70,25 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings.Issuer,
         ValidAudience = jwtSettings.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+        NameClaimType = ClaimTypes.Name // Используйте ClaimTypes.Name для User.Identity.Name
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chathub"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
     };
 });
+
 
 var app = builder.Build();
 
@@ -80,12 +100,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Add authentication middleware
+app.UseAuthentication();
 
 // Add routing
 app.UseRouting();
 
 app.UseAuthorization();
-
 app.UseCors("CorsPolicy");
 
 // Configure endpoints for controllers and hubs

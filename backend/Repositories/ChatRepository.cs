@@ -5,13 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories
 {
-    public class ChatRepository : IChatRepository
+    public class ChatRepository : BaseRepository, IChatRepository
     {
-        private readonly ApplicationDbContext _context;
 
-        public ChatRepository(ApplicationDbContext context)
+        public ChatRepository(ApplicationDbContext context): base(context)
         {
-            _context = context;
         }
 
         public async Task<User> GetUserByNameAsync(string userName)
@@ -35,11 +33,6 @@ namespace backend.Repositories
         public async Task AddChatAsync(Chat chat)
         {
             _context.Chats.Add(chat);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task SaveChangesAsync()
-        {
             await _context.SaveChangesAsync();
         }
     }

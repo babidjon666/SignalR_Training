@@ -55,8 +55,10 @@ namespace backend.Services
             dbUser2.Chats.Add(chat);
             await _chatRepository.SaveChangesAsync();
 
-            await _hubContext.Clients.User(dbUser1.Id.ToString()).SendAsync("ReceiveChatUpdate");
-            await _hubContext.Clients.User(dbUser2.Id.ToString()).SendAsync("ReceiveChatUpdate");
+        
+
+            await _hubContext.Clients.User(dbUser1.UserName).SendAsync("ReceiveChatUpdate");
+            await _hubContext.Clients.User(dbUser2.UserName).SendAsync("ReceiveChatUpdate");
 
             var goodResponse = new Result
                 {
