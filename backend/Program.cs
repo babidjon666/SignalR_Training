@@ -28,6 +28,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
     
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
+builder.Services.AddScoped<ILoginRepository, LoginRepository>();
+
 builder.Services.AddScoped<ILogin, LoginService>();
 builder.Services.AddScoped<IRegister, RegisterService>();
 builder.Services.AddScoped<IChat, ChatService>();

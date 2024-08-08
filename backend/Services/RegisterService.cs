@@ -3,9 +3,6 @@ using backend.DTOModel;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace backend.Services
 {

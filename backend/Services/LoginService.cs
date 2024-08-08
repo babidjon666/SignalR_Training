@@ -6,7 +6,6 @@ using backend.DTOModel;
 using backend.DTOModel.Login.DTO;
 using backend.Interfaces;
 using backend.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,12 +13,12 @@ namespace backend.Services
 {
     public class LoginService : ILogin
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ILoginRepository _loginRepository;
         private readonly JwtSettings _jwtSettings;
 
-        public LoginService(ApplicationDbContext _context, IOptions<JwtSettings> jwtSettings)
+        public LoginService(IOptions<JwtSettings> jwtSettings, ILoginRepository _loginRepository)
         {
-            this._context = _context;
+            this._loginRepository = _loginRepository;
             _jwtSettings = jwtSettings.Value;
         }
 
@@ -27,7 +26,7 @@ namespace backend.Services
         {
             var hashedPassword = HashPassword.GetHash(userPassword);
 
-            var dbUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == hashedPassword);
+            var dbUser = await _loginRepository.FindUser(email, hashedPassword);
             
             if (dbUser == null){
                 return new LoginResult{ 
