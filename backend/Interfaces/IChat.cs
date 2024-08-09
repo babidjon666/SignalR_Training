@@ -1,6 +1,5 @@
 using backend.DTOModel;
 using backend.DTOModel.GetChatsDTO;
-using backend.Models;
 
 namespace backend.Interfaces
 {

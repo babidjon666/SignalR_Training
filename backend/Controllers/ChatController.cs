@@ -32,10 +32,10 @@ namespace backend.Controllers
 
             if (!result.Success)
             {
-                return BadRequest(result.Message); // Используйте BadRequest для неуспешных ответов
+                return BadRequest(result.Message); 
             }
 
-            return Ok(result.Chats); // Используйте Ok для успешных ответов
+            return Ok(result.Chats); 
         }
 
         [HttpPost("Create")]
@@ -50,10 +50,10 @@ namespace backend.Controllers
 
             if (!result.Success)
             {
-                return Conflict(result.Message); // Используйте Conflict для конфликтов
+                return Conflict(result.Message); 
             }
 
-            return Ok(result.Message); // Используйте Ok для успешных ответов
+            return Ok(result.Message); 
         }
     }
 }

@@ -33,7 +33,7 @@ namespace backend.Repositories
         public async Task AddChatAsync(Chat chat)
         {
             _context.Chats.Add(chat);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
     }
 }
