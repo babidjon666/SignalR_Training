@@ -1,17 +1,21 @@
 using backend.DTOModel;
 using backend.DTOModel.MessageDTO;
+using backend.Hubs;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Services
 {
     public class MessageService : IMessage
     {
         private readonly IMessageRepository _messageRepository;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public MessageService(IMessageRepository _messageRepository)
+        public MessageService(IMessageRepository _messageRepository, IHubContext<ChatHub> _hubContext)
         {
             this._messageRepository = _messageRepository;
+            this._hubContext = _hubContext;
         }
 
         public async Task<GetMessagesResult> GetMessages(int chatId)
@@ -98,6 +102,18 @@ namespace backend.Services
             user.Messages.Add(message);
             chat.Messages.Add(message);
             await _messageRepository.SaveChangesAsync();
+
+            var messageDTO = new MessageDTO
+            {
+                ChatId = chatId,
+                Sender = message.Owner.UserName,
+                Text = message.Text,
+                Time = message.DateTime
+            };
+
+            foreach(var chatUser in chat.Users){
+                await _hubContext.Clients.User(chatUser.UserName).SendAsync("ReceiveMessage", messageDTO);
+            }
 
             var goodResult = new Result{
                 Success = true,

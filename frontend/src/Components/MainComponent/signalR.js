@@ -2,7 +2,7 @@ import { HubConnectionBuilder } from '@microsoft/signalr';
 
 let connection;
 
-export const initializeSignalR = (onReceiveChatUpdate) => {
+export const initializeSignalR = (onReceiveChatUpdate, onReceiveMessage) => {
 
 
     if (connection) {
@@ -25,6 +25,11 @@ export const initializeSignalR = (onReceiveChatUpdate) => {
             connection.on("ReceiveChatUpdate", () => {
                 console.log("Received chat update");
                 onReceiveChatUpdate();
+            });
+
+            connection.on("ReceiveMessage", (message) => {
+                console.log("Received message", message);
+                onReceiveMessage(message);
             });
         })
         .catch(error => {

@@ -19,6 +19,7 @@ export const handleSubmit = async (e, formData, navigate, message) => {
         if (response.data.result.success) {
             message.success(response.data.result.message);
             const user = {
+                id: response.data.id,
                 email: response.data.email,
                 userName: response.data.userName,
                 userSurname: response.data.userSurname,

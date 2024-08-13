@@ -1,37 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { fetchChats, createChat } from './Api'; 
+import { fetchChats, createChat, fetchMessages, sendMessage } from './Api'; 
 import { Messages } from '../MessagesComponent/Messages';
 import { initializeSignalR } from './signalR'; 
-
-const mockMessages = [
-    { id: 1, user: 'Марк', text: 'Привет!' },
-    { id: 2, user: 'Рома', text: 'Привет, Марчик!' },
-    { id: 3, user: 'Марк', text: 'Ты же знаешь зачем я тебе пишу?' },
-    { id: 4, user: 'Рома', text: 'Ну.....' },
-    { id: 5, user: 'Марк', text: '*Злостно посмотрел*' },
-    { id: 6, user: 'Рома', text: '*Начал собирать сумку со взрывчаткой*' }
-];
 
 export const Main = () => {
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
     const [chats, setChats] = useState([]);
     const [currentChat, setCurrentChat] = useState(null);
+    const [currentMessages, setCurrentMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const currentUser = user?.userName;
+    const currentUserId = user?.id;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
                 const data = await fetchChats(currentUser, token);
-                console.log("API Response:", data);
 
                 const chatData = data.$values;
                 const chatsWithMessages = chatData.map(chat => ({
                     chatId: chat.chatId,
-                    name: `Chat with ${chat.user2Name}`,
-                    messages: mockMessages
+                    name: chat.user2Name,
+                    messages: []
                 }));
                 setChats(chatsWithMessages);
             } catch (error) {
@@ -49,21 +41,38 @@ export const Main = () => {
                     const chatData = data.$values;
                     const chatsWithMessages = chatData.map(chat => ({
                         chatId: chat.chatId,
-                        name: `Chat with ${chat.user2Name}`,
-                        messages: mockMessages
+                        name: chat.user2Name,
+                        messages: []
                     }));
                     setChats(chatsWithMessages);
                 })
                 .catch(error => console.error(error.message));
         };
 
-        const connection = initializeSignalR(handleReceiveChatUpdate);
+        const handleReceiveMessage = (message) => {
+            setCurrentMessages(prevMessages => [
+                ...prevMessages,
+                message
+            ]);
+        };
 
-
-    }, [currentUser]);
+        initializeSignalR(handleReceiveChatUpdate, handleReceiveMessage);
+    }, [currentUser, currentChat]);
 
     const handleChatClick = (chat) => {
         setCurrentChat(chat);
+        fetchMessages(chat.chatId, localStorage.getItem('token'))
+            .then(data => {
+                const messageData = data.$values;
+                const messagesInChat = messageData.map(message => ({
+                    id: message.id,
+                    chatId: message.chatId,
+                    sender: message.sender,
+                    text: message.text,
+                    time: message.time
+                }));
+                setCurrentMessages(messagesInChat);
+            });
     };
 
     const addChat = async () => {
@@ -86,20 +95,19 @@ export const Main = () => {
         e.preventDefault();
         if (!newMessage.trim()) return;
 
-        const message = {
-            user: currentUser,
-            text: newMessage
-        };
-
-        // Here you should add the code to send the message to the server
-        // For now, we just clear the input field
-        setNewMessage('');
+        try {
+            const token = localStorage.getItem('token');
+            await sendMessage(currentChat.chatId, currentUserId, newMessage, token);
+            setNewMessage('');
+        } catch (error) {
+            console.error(error.message);
+        }
     };
 
     return (
         <div className="Container">
             <div className="Chats">
-                <h2>{currentUser}</h2>
+                <h2 className='textLOGO'>Hi, {currentUser}!</h2>
                 <button className="AddChatButton" onClick={addChat}>Add Chat</button>
                 <ul>
                     {chats.map(chat => (
@@ -111,12 +119,14 @@ export const Main = () => {
             </div>
             <div className="ChatWindow">
                 {currentChat ? (
-                    <div>
+                    <div className="ChatContent">
                         <h2>{currentChat.name}</h2>
-                        <Messages
-                            currentChat={currentChat}
-                            currentUser={currentUser}
-                        />
+                        <div className="MessagesContainer">
+                            <Messages
+                                currentUser={currentUser}
+                                currentMessages={currentMessages}
+                            />
+                        </div>
                         <form onSubmit={handleSendMessage} className="MessageInputForm">
                             <input 
                                 type="text" 
