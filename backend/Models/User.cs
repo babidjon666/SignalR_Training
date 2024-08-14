@@ -13,5 +13,11 @@ namespace backend.Models
         public List<Chat> Chats{ get; set; } = new List<Chat>();
         [JsonIgnore]
         public List<Message> Messages{ get; set; } = new List<Message>();
+        [JsonIgnore]
+        public List<User> Friends{ get; set; } = new List<User>();
+        [JsonIgnore]
+        public List<User> Subscribers{ get; set; } = new List<User>();
+        [JsonIgnore]
+        public List<Notify> Notifies{ get; set; } = new List<Notify>();
     }
 }

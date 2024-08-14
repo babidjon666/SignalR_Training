@@ -1,0 +1,101 @@
+.user-profile {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: auto;
+}
+
+.banner {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile-photo {
+    margin-right: 20px;
+}
+
+.profile-photo img {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-actions {
+    margin-top: 10px;
+}
+
+.action-button {
+    background-color: rgb(232, 85, 85);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background-color: rgb(210, 60, 60);
+}
+
+.profile-content {
+    padding: 20px;
+}
+
+.photos-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.photos-grid img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin: 5px;
+    border-radius: 8px;
+}
+
+.posts-list .post,
+.liked-posts .post {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.friends-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.friends-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.friends-list img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.friends-list span {
+    font-size: 16px;
+}

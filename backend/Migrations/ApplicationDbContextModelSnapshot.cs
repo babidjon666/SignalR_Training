@@ -37,6 +37,36 @@ namespace backend.Migrations
                     b.ToTable("UserChats", (string)null);
                 });
 
+            modelBuilder.Entity("UserFriends", b =>
+                {
+                    b.Property<int>("FriendsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FriendsId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserFriends");
+                });
+
+            modelBuilder.Entity("UserSubscribers", b =>
+                {
+                    b.Property<int>("SubscribersId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("User1Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("SubscribersId", "User1Id");
+
+                    b.HasIndex("User1Id");
+
+                    b.ToTable("UserSubscribers");
+                });
+
             modelBuilder.Entity("backend.Models.Chat", b =>
                 {
                     b.Property<int>("Id")
@@ -78,6 +108,37 @@ namespace backend.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("backend.Models.Notify", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsReaded")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NotifyType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifies");
                 });
 
             modelBuilder.Entity("backend.Models.User", b =>
@@ -124,6 +185,36 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("UserFriends", b =>
+                {
+                    b.HasOne("backend.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("FriendsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("UserSubscribers", b =>
+                {
+                    b.HasOne("backend.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscribersId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("User1Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("backend.Models.Message", b =>
                 {
                     b.HasOne("backend.Models.Chat", "Chat")
@@ -143,6 +234,17 @@ namespace backend.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("backend.Models.Notify", b =>
+                {
+                    b.HasOne("backend.Models.User", "User")
+                        .WithMany("Notifies")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("backend.Models.Chat", b =>
                 {
                     b.Navigation("Messages");
@@ -151,6 +253,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.User", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("Notifies");
                 });
 #pragma warning restore 612, 618
         }

@@ -29,7 +29,7 @@ export const handleSubmit = async (e, formData, navigate, message) => {
             localStorage.setItem('token', user.token);
             localStorage.setItem('user', JSON.stringify(user));
             
-            navigate('/main', { state: { user } });
+            navigate('/messager', { state: { user } });
         } else {
             message.warning(response.data.result.message);
         }

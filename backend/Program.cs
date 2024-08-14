@@ -34,12 +34,16 @@ builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<IRegisterRepository, RegisterRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IFriendsRepository, FriendsRepository>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
 // Регистрация сервисов
 builder.Services.AddScoped<ILogin, LoginService>();
 builder.Services.AddScoped<IRegister, RegisterService>();
 builder.Services.AddScoped<IChat, ChatService>();
 builder.Services.AddScoped<IMessage, MessageService>();
+builder.Services.AddScoped<IFriends, FriendsService>();
+builder.Services.AddScoped<IProfile, ProfileService>();
 
 // Регистрация провайдера для SignalR
 builder.Services.AddSingleton<IUserIdProvider, UsernameBasedUserIdProvider>();

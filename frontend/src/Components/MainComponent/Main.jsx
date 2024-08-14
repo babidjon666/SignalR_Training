@@ -73,6 +73,7 @@ export const Main = () => {
                 }));
                 setCurrentMessages(messagesInChat);
             });
+        setNewMessage('');
     };
 
     const addChat = async () => {

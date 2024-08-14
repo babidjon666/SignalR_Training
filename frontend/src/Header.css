@@ -1,0 +1,113 @@
+.head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: rgb(51, 51, 51);
+    color: white;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: rgb(232, 85, 85);
+}
+
+.search-and-profile {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.search-bar {
+    position: relative;
+    width: 400px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid rgb(232, 85, 85);
+    border-radius: 5px;
+    outline: none;
+    color: rgb(51, 51, 51);
+}
+
+.suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid rgb(232, 85, 85);
+    border-radius: 4px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.suggestions li {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.suggestions li:hover {
+    background-color: rgb(232, 85, 85);
+    color: white;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.username {
+    color: rgb(51, 51, 51);
+    margin-right: 10px; /* Убираем отступ перед именем */
+    flex-grow: 1;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-left: 10px; /* Добавляем отступ слева для кнопок */
+}
+
+.action-button {
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    width: 150px;
+}
+
+.view-profile-button {
+    background-color: rgb(51, 51, 51);
+    color: white;
+}
+
+.add-friend-button {
+    background-color: rgb(232, 85, 85);
+    color: white;
+}
+
+.profile-icon {
+    margin-left: 50px;
+    cursor: pointer;
+    color: white;
+}
