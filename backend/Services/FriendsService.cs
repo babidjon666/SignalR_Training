@@ -1,5 +1,6 @@
 using backend.DTOModel.Friends.DTO;
 using backend.Interfaces;
+using backend.Models;
 
 namespace backend.Services
 {
@@ -12,27 +13,38 @@ namespace backend.Services
             this._friendsRepository = _friendsRepository;
         }
 
-        public async Task<FriendsResult> FindFriend(string name)
+        public async Task<FriendsResult> FindFriend(string name, int id)
         {
             var listOfUsers = await _friendsRepository.SearchUser(name);
 
-            if (listOfUsers == null){
-                var badResult = new FriendsResult{
+            if (listOfUsers == null || !listOfUsers.Any())
+            {
+                return new FriendsResult
+                {
                     IsSucces = false,
                     Message = "Не найдено",
-                    Users = []
+                    Users = new List<UserWithSubscriptionStatus>()
                 };
-
-                return badResult;
             }
 
-            var goodResult = new FriendsResult{
+            var usersWithStatus = new List<UserWithSubscriptionStatus>();
+
+            foreach (var user in listOfUsers)
+            {
+                bool isSubscribed = await _friendsRepository.CheckSub(id, user.Id);
+                usersWithStatus.Add(new UserWithSubscriptionStatus
+                {
+                    User = user,
+                    IsSubscribed = isSubscribed
+                });
+            }
+
+            return new FriendsResult
+            {
                 IsSucces = true,
                 Message = "Найдены!",
-                Users = listOfUsers
+                Users = usersWithStatus
             };
-
-            return goodResult;
         }
     }
 }

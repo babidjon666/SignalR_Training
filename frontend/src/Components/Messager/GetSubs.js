@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-export const FindUser = async (id, userName, token) => {
-    if (!userName) throw new Error('Current user is not defined');
+export const GetSubs = async (id, token) => {
+    if (!id) throw new Error('Current user is not defined');
     
     if (!token) throw new Error('No token found. Please log in first.');
 
     try {
-        const response = await axios.get(`http://localhost:5138/api/Friends?userName=${userName}&id=${id}`, {
+        const response = await axios.get(`http://localhost:5138/api/Profile/GetSubs?id=${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

@@ -3,6 +3,8 @@
     flex-direction: column;
     height: 100vh;
     overflow: auto;
+    background-color: rgb(51, 51, 51);
+    
 }
 
 .banner {
@@ -17,6 +19,8 @@
     padding: 20px;
     background-color: #fff;
     border-bottom: 1px solid #ddd;
+    background-color: rgb(51, 51, 51);
+    color: white;
 }
 
 .profile-photo {
@@ -81,6 +85,7 @@
 .friends-list {
     list-style-type: none;
     padding: 0;
+    color: white;
 }
 
 .friends-list li {

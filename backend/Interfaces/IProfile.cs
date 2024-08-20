@@ -12,5 +12,6 @@ namespace backend.Interfaces
         Task<SubscribeResult> Subscribe(int myId, int friendId);
         Task<Result> AcceptFriend(int myId, int subId);
         Task<GetFriendsResult> GetFriend(int userId);
+        Task<bool> CheckSub(int myId, int subId);
     }
 }

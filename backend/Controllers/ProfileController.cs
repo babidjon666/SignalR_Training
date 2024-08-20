@@ -44,6 +44,16 @@ namespace backend.Controllers
             return Ok(response.Message);
         }
 
+        [HttpGet("CheckSub")]
+        public async Task<IActionResult> CheckSub(int myID, int friendID){
+            var response = await _profileService.CheckSub(myID, friendID);
+
+            if (response){
+                return Conflict("Вы уже подписаны на пользователя!");
+            }
+            return Ok("Подписка");
+        }
+
         [HttpGet("GetSubs")]
         public async Task<ActionResult<IEnumerable<User>>> GetSubs(int id){
             var response = await _profileService.GetMySubs(id);

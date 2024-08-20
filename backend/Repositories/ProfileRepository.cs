@@ -45,7 +45,7 @@ namespace backend.Repositories
         public async Task Sub(User me, User friend)
         {
             friend.Subscribers.Add(me);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task AddFriend(User me, User sub){

@@ -61,6 +61,17 @@ namespace backend.Services
             return goodResponse;
         }
 
+        public async Task<bool> CheckSub(int myId, int subId)
+        {
+            var me = await _profileRepository.GetUserById(myId);
+            var friend = await _profileRepository.GetUserById(subId);
+
+            if (friend.Subscribers.Contains(me)){
+                return true;
+            }
+            return false;
+        }
+
         public async Task<ProfileResult> FindUser(int id)
         {
             var dbUser = await _profileRepository.GetUserById(id);
@@ -163,6 +174,15 @@ namespace backend.Services
                 return badResponse;
             }
 
+            if (myId == friendId){
+                var badResponse = new SubscribeResult{
+                    IsSucces = false,
+                    Message = "Вы не моежете подписаться на себя!"
+                };
+
+                return badResponse;
+            }
+
             if (friend.Subscribers.Contains(me)){
                 var badResponse = new SubscribeResult{
                     IsSucces = false,
@@ -172,18 +192,16 @@ namespace backend.Services
                 return badResponse;
             }
             var notify = await _profileRepository.CreateNotify(friend, Enums.NotifyType.NewSub, "У вас новый подписчик!");
-            await _profileRepository.Sub(me, friend);
+            
+            if (notify != null){
+                await _profileRepository.Sub(me, friend);
+            }
 
             var goodResponse = new SubscribeResult{
                 IsSucces = true,
                 Message = $"Пользователь {me.UserName} подписался на {friend.UserName}"
             };
 
-            
-            
-            if (notify != null){
-                //await _hubContext.Clients.User(friend.UserName).SendAsync("SendNotify", notify);
-            }
             return goodResponse;
         }
     }

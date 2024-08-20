@@ -1,3 +1,4 @@
+using backend.DTOModel.Friends.DTO;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,7 @@ namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class FriendsController: ControllerBase
     {
         private readonly IFriends _friendsService;
@@ -18,12 +19,9 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<User>> SearchFriends(string userName){
-            var response = await _friendsService.FindFriend(userName);
-
-            if (!response.IsSucces){
-                return Conflict("Пользователи не найдены");
-            }
+        public async Task<ActionResult<IEnumerable<UserWithSubscriptionStatus>>> SearchFriends(string userName, int id)
+        {
+            var response = await _friendsService.FindFriend(userName, id);
 
             return Ok(response.Users);
         }

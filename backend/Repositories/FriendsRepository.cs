@@ -20,5 +20,19 @@ namespace backend.Repositories
                             .ToListAsync();
             return listOfUsers;
         }
+
+        //если я подписан, то TRUE
+        public async Task<bool> CheckSub(int myID, int friendID){
+            var me = await _context.Users.FirstOrDefaultAsync(u => u.Id == myID);
+            var friend = await _context.Users
+                                .Include(u => u.Subscribers)
+                                .FirstOrDefaultAsync(u => u.Id == friendID);
+
+            if (friend.Subscribers.Contains(me)){
+                return true;
+            }
+
+            return false;
+        }
     }
 }

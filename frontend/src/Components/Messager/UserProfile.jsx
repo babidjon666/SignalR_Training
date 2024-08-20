@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { GetSubs } from "./GetSubs";
+import { useNavigate } from "react-router-dom";
 
 const mockUser = {
     userName: "",
@@ -27,7 +29,8 @@ const mockUser = {
         { profilePhotoUrl: "https://via.placeholder.com/50.png?text=Friend+1", userName: "Friend 1" },
         { profilePhotoUrl: "https://via.placeholder.com/50.png?text=Friend+2", userName: "Friend 2" },
         { profilePhotoUrl: "https://via.placeholder.com/50.png?text=Friend+3", userName: "Friend 3" }
-    ]
+    ],
+    subs: [] // Initially empty, will be populated from API
 };
 
 const UserProfile = () => {
@@ -37,20 +40,30 @@ const UserProfile = () => {
     const [error, setError] = useState(null);
     const [showLikedPosts, setShowLikedPosts] = useState(false);
     const [showFriends, setShowFriends] = useState(false);
+    const [showSubs, setShowSubs] = useState(false);
     const token = localStorage.getItem('token');
+    const navigate = useNavigate();
+
+    const handleProfileClick = useCallback((userId) => {
+        navigate(`/profile/${userId}`);
+    }, [navigate]);
 
     useEffect(() => {
-        // Mock fetch function, replace with actual API call
         const fetchUser = async () => {
             try {
-                const response = await axios.get(`http://localhost:5138/api/Profile?id=${userId}`, {
+                const userResponse = await axios.get(`http://localhost:5138/api/Profile?id=${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                mockUser.userName = response.data.userName;
-                mockUser.userSurname = response.data.userSurname;
-                mockUser.email = response.data.email;
+
+                const subsResponse = await GetSubs(userId, token);
+                console.log(subsResponse.$values);
+                mockUser.userName = userResponse.data.userName;
+                mockUser.userSurname = userResponse.data.userSurname;
+                mockUser.email = userResponse.data.email;
+                mockUser.subs = subsResponse.$values; // Update subs with fetched data
+
                 setUser(mockUser);
             } catch (err) {
                 setError(err);
@@ -85,22 +98,25 @@ const UserProfile = () => {
                         <button className="action-button" onClick={() => setShowFriends(!showFriends)}>
                             {showFriends ? "Hide Friends" : "Show Friends"}
                         </button>
+                        <button className="action-button" onClick={() => setShowSubs(!showSubs)}>
+                            {showSubs ? "Hide Subs" : "Show Subs"}
+                        </button>
                     </div>
                 </div>
             </div>
             <div className="profile-content">
-            <section className="photos">
-                        <h2>Photos</h2>
-                        <div className="photos-grid">
-                            {hasData && user.photos.length > 0 ? (
-                                user.photos.map((photo, index) => (
-                                    <img key={index} src={photo.url} alt={`User photo ${index}`} />
-                                ))
-                            ) : (
-                                <p>No photos available</p>
-                            )}
-                        </div>
-                    </section>
+                <section className="photos">
+                    <h2>Photos</h2>
+                    <div className="photos-grid">
+                        {hasData && user.photos.length > 0 ? (
+                            user.photos.map((photo, index) => (
+                                <img key={index} src={photo.url} alt={`User photo ${index}`} />
+                            ))
+                        ) : (
+                            <p>No photos available</p>
+                        )}
+                    </div>
+                </section>
                 {showLikedPosts && (
                     <section className="liked-posts">
                         <h2>Liked Posts</h2>
@@ -131,6 +147,24 @@ const UserProfile = () => {
                                 ))
                             ) : (
                                 <li>No friends available</li>
+                            )}
+                        </ul>
+                    </section>
+                )}
+                {showSubs && (
+                    <section className="friends">
+                        <h2>Subscribers</h2>
+                        <ul className="friends-list">
+                            {hasData && user.subs.length > 0 ? (
+                                user.subs.map((sub, index) => (
+                                    <li key={index}>
+                                        <img src={"https://via.placeholder.com/120x120.png?text=Profile+Photo"} alt={`${sub.userName} profile`} />
+                                        <span>{sub.userName} {sub.userSurname}</span>
+                                        <button className="action-button" onClick={() => handleProfileClick(sub.id)}>Профиль</button>
+                                    </li>
+                                ))
+                            ) : (
+                                <li>No subs available</li>
                             )}
                         </ul>
                     </section>
